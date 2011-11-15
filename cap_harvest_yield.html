@@ -44,6 +44,15 @@
 </div>
 
 <div class="slide">
+  <h1> Gilbert and Lynch </h1>
+  "Brewer's Conjecture and the Feasibility of Consistent, Available, Parition-Tolerant Web Services"
+  <ul>
+    <li> First formal proof of Brewer's conjecture. </li>
+    <li> Characterization of systems according to Brewer's conjecture. </li>
+  </ul>
+</div>
+
+<div class="slide">
   <h1>Brewer's Conjecture</h1>
   <p> A shared data system can have at most two of the following three properties: </p>
   <ul class="incremental">
@@ -92,8 +101,11 @@
 
 <div class="slide">
   <h1> Characterizing Systems - AP </h1>
-  Sacrifice consistency: Tolerate stale/partial data in the face of failures.
-  Examples:
+  <p>
+    Sacrifice consistency: Tolerate stale/partial data in the face of failures. Use read-repair/
+    anti-entropy techniques to restore consistency once partition disappears.
+  </p>
+  <p>Examples:</p>
   <ul>
     <li> Dynamo clones </li>
     <li> Web caches </li>
@@ -137,6 +149,15 @@
 </div>
 
 <div class="slide">
+  <h1> Brewer and Fox </h1>
+  "Harvest, Yield, and Scalable Tolerant Systems"
+  <ul>
+    <li> Introduces the concepts of Harvest and Yield </li>
+    <li> Techniques for using Harvest to improve Yield </li>
+  </ul>
+</div>
+
+<div class="slide">
   <h1> Harvest and Yield </h1>
   <ul>
     <li> <b> Yield </b> - Probability of successfully completing a request.</li>
@@ -146,15 +167,20 @@
 
 <div class="slide">
   <h1> Sacrificing Harvest to Improve Yield </h1>
+  <center> <img src="img/pixel_porn.png" /> </center>
+</div>
+
+<div class="slide">
+  <h1> Sacrificing Harvest to Improve Yield </h1>
   Depending on the application, we can return a partial/stale result instead of no result
   during failure scenarios.
 
   Examples:
-  <ul>
+  <ul class="incremental">
+    <li> Porn quality degredation on lossy or skinny links. </li>
     <li> Partial page rendering on Amazon. </li>
     <li> Static fallback newsfeed for Facebook. </li>
     <li> Incomplete search results. </li>
-    <li> Porn quality degredation on lossy or skinny links. </li>
   </ul>
 </div>
 
@@ -180,7 +206,7 @@
     <li> PaaS functionality. (Instance scaling, health monitoring, etc.)</li>
     <li> Application sandboxing. </li>
     <li> SSL </li>
-  </ul>	
+  </ul>
 </div>
 
 <div class="slide">
