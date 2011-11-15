@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -28,8 +28,8 @@
 <div id="currentSlide"><!-- DO NOT EDIT --></div>
 <div id="header"></div>
 <div id="footer">
-<h1>[location/date of presentation]</h1>
-<h2>[slide show title here]</h2>
+<h1>Tsumobi HQ / 2011-11-15</h1>
+<h2>{C,A}P, Harvest, and Yield</h2>
 </div>
 
 </div>
@@ -38,28 +38,151 @@
 <div class="presentation">
 
 <div class="slide">
-<h1>[slide show title here]</h1>
-<h2>[slide show subtitle here]</h2>
-<h3>[name of presenter]</h3>
-<h4>[affiliation of presenter]</h4>
+<h1>{C,A}P, Harvest, and Yield</h1>
+<h2>Tsumobi Readings in (Distributed) Systems</h2>
+<h3>Matt Page</h3>
 </div>
-
 
 <div class="slide">
-<h1>[slide title]</h1>
-<ul>
-<li>[point one]</li>
-<li>[point two]</li>
-<li>[point three]</li>
-<li>[point four]</li>
-<li>[point five]</li>
-</ul>
-<div class="handout">
-[any material that should appear in print but not on the slide]
-</div>
+  <h1>Brewer's Conjecture</h1>
+  <p> A shared data system can have at most two of the following three properties: </p>
+  <ul class="incremental">
+    <li> <b>Consistency</b> - Updates appear to happen at the same logical time across all nodes.</li>
+    <li> <b>Availability</b> - Requests to non-failing nodes always return a result.  </li>
+    <li> <b>Partition tolerance</b> - System tolerates arbitrary message loss between groups of nodes. </li>
+  </ul>
 </div>
 
+<div class="slide">
+  <h1>Proof of Brewer's Conjecture</h1>
+  Asynchronous network model:
+  <ul>
+    <li> No clocks. </li>
+    <li> Decisions can be made only in response to messages received. </li>
+  </ul>
+  <p> Somewhat surprising: even with no message loss we cannot guarantee CAP. </p>
+</div>
 
+<div class="slide">
+  <h1>Proof of Brewer's Conjecture</h1>
+  <p> Consider the following execution: </p>
+  <center>
+    <img src="img/cap_proof.png" />
+  </center>
+</div>
+
+<div class="slide">
+  <h1>Proof of Brewer's Conjecture</h1>
+  Partially synchronous network model:
+  <ul>
+    <li> Each node has a clock. </li>
+    <li> Message delays are bounded. </li>
+    <li> Message processing is also bounded. </li>
+  </ul>
+  <p>
+  Previous "proof" still applies in the face of message loss.
+  CAP possible if no messages lost.
+  </p>
+</div>
+
+<div class="slide">
+  <h1> Characterizing Systems</h1>
+  Given that we can only choose two of {C,A,P}, what useful systems can we build?
+</div>
+
+<div class="slide">
+  <h1> Characterizing Systems - AP </h1>
+  Sacrifice consistency: Tolerate stale/partial data in the face of failures.
+  Examples:
+  <ul>
+    <li> Dynamo clones </li>
+    <li> Web caches </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Characterizing Systems - CP </h1>
+  Sacrifice availability: Refuse updates in the face of failures.
+  Examples:
+  <ul>
+    <li> Single node DB systems </li>
+    <li> Partitioned datastores with primary master per partition </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Characterizing Systems - CA </h1>
+  <p> Let's pretend partitions don't happen: </p>
+  <img src="img/bury_head_in_sand.png" />
+</div>
+
+<div class="slide">
+  <h1> Characterizing Systems - CA </h1>
+  Partitions happen:
+  <ul>
+    <li> Switches fail. </li>
+    <li> Power (and backup power) fails. </li>
+    <li> SiteOps inadvertently disconnect network cables. </li>
+    <li> Undersea fiber is severed. </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Takeaway </h1>
+  When a partition occurs, which of the following do you give up?
+  <ul>
+    <li> Consistency </li>
+    <li> Availability </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Harvest and Yield </h1>
+  <ul>
+    <li> <b> Harvest </b> - Probability of successfully completing a request.</li>
+    <li> <b> Yield </b> - Completeness of the returned answer. </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Sacrificing Harvest to Improve Yield </h1>
+  Depending on the application, we can return a partial/stale result instead of no result
+  during failure scenarios.
+
+  Examples:
+  <ul>
+    <li> Partial page rendering on Amazon. </li>
+    <li> Static fallback newsfeed for Facebook. </li>
+    <li> Incomplete search results. </li>
+    <li> Porn quality degredation on lossy or skinny links. </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Harvest/Yield Applied to System Architecture </h1>
+  <ul>
+    <li> Sacrifice Yield at the subsystem (service) level. </li>
+    <li> Sacrifice Harvest at the composite level. </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Orthogonal Mechanisms </h1>
+  Independent subsystems with little to no consumable api for services that are provided.
+
+  Examples:
+  <ul>
+    <li> PaaS </li>
+    <li> Application sandboxing </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Takeaway </h1>
+  <ul>
+    <li> Failure is a continuum. </li>
+    <li> Architect your systems so that individual subsystems can fail without reducing overall yield. </li>
+  </ul>
 </div>
 
 </body>
