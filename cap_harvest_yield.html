@@ -119,8 +119,8 @@
     <li> P order all writes and all reads w.r.t. writes </li>
     <li> Reads return value written by previous write in P, or an initial value. </li>
     <li> P is consistent with ordering of read/write requests submitted at each node </li>
-    <li> &#8707 interval of time T s.t. if &#1012; completes before T begins and &#981;
-         completes after T, then &#1012 comes before &#981 in P. </li>
+    <li> &#8707 sufficiently long interval of time T w/ no message loss. If &#1012; completes before
+         T begins and &#981; begins after T ends, then &#1012 comes before &#981 in P. </li>
   </ul>
   </div>
 </div>
