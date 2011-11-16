@@ -85,13 +85,35 @@
   Partially synchronous network model:
   <ul>
     <li> Each node has a clock. </li>
-    <li> Message delays are bounded. </li>
-    <li> Message processing is also bounded. </li>
+    <li> Message delays are bounded. (t<sub>m</sub>)</li>
+    <li> Message processing is also bounded. (t<sub>local</sub>)</li>
   </ul>
   <p>
   Previous "proof" still applies in the face of message loss.
   CAP possible if no messages lost.
   </p>
+</div>
+
+<div class="slide">
+  <h1> t-Connected Consistency </h1>
+  <ul>
+    <li> Only applies in the Partially Synchronous Network Model </li>
+    <li> Weaker form of consistency </li>
+    <li> Strong consistency given no message loss </li>
+    <li> Stale data may be returned given message loss </li>
+    <li> Strong consistency is restored after a sufficient interval with no message loss (T)</li>
+  </ul>
+  </div>
+</div>
+
+<div class="slide">
+  <h1> System with t-Connected Consistency </h1>
+  <ul>
+    <li> Centralized writer C </li>
+    <li> Read returns result, or stale data if no reply from C in 2*t<sub>m</sub> + t<sub>local</sub></li>
+    <li> Writes always succeed, but are replayed if no reply from C in 2*t<sub>m</sub> + t<sub>local</sub></li>
+    <li> C serializes all writes and periodically broadcasts the latest values, along with sequence numbers, to all nodes </li>
+  </ul>
 </div>
 
 <div class="slide">
@@ -107,7 +129,7 @@
   </p>
   <p>Examples:</p>
   <ul>
-    <li> Dynamo clones </li>
+    <li> Dynamo clones (Riak, Voldemort, Cassandra)</li>
     <li> Web caches </li>
   </ul>
 </div>
@@ -118,7 +140,7 @@
   Examples:
   <ul>
     <li> Single node DB systems </li>
-    <li> Partitioned datastores with primary master per partition </li>
+    <li> Partitioned datastores with primary master per partition (MongoDB, HBase)</li>
   </ul>
 </div>
 
@@ -172,10 +194,12 @@
 
 <div class="slide">
   <h1> Sacrificing Harvest to Improve Yield </h1>
-  Depending on the application, we can return a partial/stale result instead of no result
-  during failure scenarios.
+  <p>
+    Depending on the application, we can return a partial/stale result instead of no result
+    during failure scenarios.
+  </p>
 
-  Examples:
+  <p>Examples:</p>
   <ul class="incremental">
     <li> Porn quality degredation on lossy or skinny links. </li>
     <li> Partial page rendering on Amazon. </li>
