@@ -100,13 +100,27 @@
 </div>
 
 <div class="slide">
-  <h1> t-Connected Consistency </h1>
+  <h1> t-Connected Consistency - Informally</h1>
   <ul>
     <li> Only applies in the Partially Synchronous Network Model </li>
-    <li> Weaker form of consistency </li>
-    <li> Strong consistency given no message loss </li>
     <li> Stale data may be returned given message loss </li>
     <li> Strong consistency is restored after a sufficient interval with no message loss (T)</li>
+  </ul>
+  </div>
+</div>
+
+<div class="slide">
+  <h1> t-Connected Consistency - Formally</h1>
+  <p>
+  Atomic (strong) consistency under no message loss. Under message loss, &#8707; partial ordering P,
+  such that:
+  </p>
+  <ul>
+    <li> P order all writes and all reads w.r.t. writes </li>
+    <li> Reads return value written by previous write in P, or an initial value. </li>
+    <li> P is consistent with ordering of read/write requests submitted at each node </li>
+    <li> &#8707 interval of time T s.t. if &#1012; completes before T begins and &#981;
+         completes after T, then &#1012 comes before &#981 in P. </li>
   </ul>
   </div>
 </div>
