@@ -1,0 +1,207 @@
+><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>Fast updates to binary code</title>
+<!-- metadata -->
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1" />
+<meta name="presdate" content="20111208" />
+<meta name="author" content="Jordan Clifford" />
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links -->
+<link rel="stylesheet" href="ui/default/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="ui/default/print.css" type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="ui/default/opera.css" type="text/css" media="projection" id="operaFix" />
+<!-- S5 JS -->
+<script src="ui/default/slides.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div class="layout">
+<div id="controls"><!-- DO NOT EDIT --></div>
+<div id="currentSlide"><!-- DO NOT EDIT --></div>
+<div id="header"></div>
+<div id="footer">
+<h1>Tsumobi HQ / 2011-12-08</h1>
+<h2>Fast updates to binary code</h2>
+</div>
+
+</div>
+
+
+<div class="presentation">
+
+<div class="slide">
+<h1>Fast updates to binary code</h1>
+<h2>Tsumobi Readings in (Sometimes Distributed) Systems</h2>
+<h3>Jordan Clifford</h3>
+</div>
+
+<div class="slide">
+  <h1> Steal these slides! </h1>
+  <h2> Courtesy of Matt </h2>
+  <a href="https://github.com/mpage/presos/">https://github.com/mpage/presos/</a>
+</div>
+
+<div class="slide">
+  <h1> Updating Code on Users' devices </h1>
+  <p> When an update is ready, we want users to have a seamless experience: </p>
+  <h2> In scope: </h2>
+  <ul class="incremental">
+    <li> <b>Seamless</b> - Avoid reboots as much as possible </li>
+    <li> <b>Lightweight</b> - Consume as few resources (bandwith/cpu/human attention) as possible</li>
+  </ul>
+  <br><br>
+  <h2> Out of scope: </h2>
+  <ul class="incremental">
+    <li> <b> Secure </b> - Avoid man-in-the middle attacks or unsigned patches </li>
+  </ul>
+  <br><br>
+  <h2> Any others? </h2>
+</div>
+
+<div class="slide">
+  <h1> Reboots are painful! </h1>
+  <br>
+  <ul>
+    <center>
+      <img src="img/fast_updates/reboot.png" />
+    </center>
+    <li> Interrupts users (increased downtime) </li>
+    <li> For many with large clusters of servers, reboots literally cost money. </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Not patching software can be worse! </h1>
+  <center>
+    <p> Reboots required for kernel updates by major Linux distributions: </p>
+    <img src="img/fast_updates/required_updates.png"
+         alt= "Reboots required for kernel updates by major Linux distributions"/>
+  </center>
+  <br><br>
+  <h2> ... but there is an alternative </h2>
+</div>
+
+<div class="slide">
+  <h1> KSplice offers rebootless updates </h1>
+  <p> Needed vocabulary </p>
+  <ul>
+    <li> <b> object code </b> - machine code, potentially with symbolic references </li>
+    <li> <b> run </b> - Object code currently running  </li>
+    <li> <b> pre </b> - Object code from previous compiled source </li>
+    <li> <b> post </b> - Object code from current compiled source </li>
+  </ul>
+  <br><br>
+  <p> Big ideas </p>
+  <ul>
+    <li> Update code by placing new versions of any modified functions onto the heap </li>
+    <li> Use new versions of functions via a jmp at the old function  </li>
+    <li> Patches can be generated 100% automatically unless data structure modifications are required </li>
+    <li> Does in memory updates <b>only</b>. For on disk updates, a tool like bsdiff4 should be employed. Otherwise, updates are lost on reboot. </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Live updates to a kernel </h1>
+  <p> Steps: </p>
+  <ol>
+    <li> <b> Generate replacement code </b> - Requires source code of before and after </li>
+    <li> <b> run-pre matching </b> - Verify that the code running matches what we expect and resolve symbolic references </li>
+    <li> <b> update the running code in memory </b> - Requires a pause of all running threads. Any function that needs to be updated cannot appear in any kernel stacktraces </li>
+    <li> <b> resume normal kernel execution </b> </li>
+  </ol>
+</div>
+
+<div class="slide">
+  <h1> Creation of the replacement code </h1>
+  <br>
+  <center>
+    <img src="img/fast_updates/gen_replacement_code.png" />
+  </center>
+  <ul>
+  <li> Finding the functions that differ is the key to the process </li>
+  <li> Done at the object code level for maximum robustness. (Fewer required assumptions. The machine's instructions either have changed, or they haven't) </li>
+  <li> If any data structures have been updated, handwritten code will need to be provided for the KSplice core kernel module </li>
+</div>
+
+<div class="slide">
+  <h1> run-pre matching </h1>
+  <br>
+  <center>
+    <img src="img/fast_updates/run-pre-matching.png" />
+  </center>
+  <ul>
+  <li> Confirm run and pre match - The update is aborted if the code isn't a perfect match </li>
+  <li> Resolving symbolic references is critical to being able to patch a live system </li>
+  <li> If the kernel has been previously patched, pre needs to be compiled from source that has previous patches applied </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1> Updating code in EIGHT easy steps </h1>
+  <br>
+  <ol>
+    <li> Execute user provided code via ksplice_pre_apply </li>
+    <li> Stop execution of the kernel via stop_machine </li>
+    <li> Retry until all functions that need to be updated are not present in any stack traces </li>
+    <li> Place new versions of functions in memory </li>
+    <li> Insert jmp instructions at the beginning of old methods </li>
+    <li> Apply any custom code using the ksplice_apply macro </li>
+    <li> Resume kernel functioning </li>
+    <li> Execute any ksplice_post_apply macros provided </li>
+  </ol>
+</div>
+
+<div class="slide">
+  <h1> So now you're running the most up to date code. </h1>
+  <img src="img/fast_updates/reboot_question.png" />
+  <br>
+  <br>
+  <center>
+  <img src="img/fast_updates/dont_do_it.png" />
+  </center>
+  <p> Sometimes we have no choice! </p>
+  <p> With your awesome in memory update, you can package a raw binary diff </p>
+</div>
+
+<div class="slide">
+  <h1> bsdiff 4: Naive differences of Executable code </h1>
+  <p> Types of changes as a result </p>
+  <ul>
+    <li> <b> 0th order </b> - resulting from same source </li>
+    <li> <b> 1st order </b> - resulting directly from source differences </li>
+    <li> <b> 2nd order </b> - resulting indirectly from source differences </li>
+  </ul>
+
+  <p> Traditionally, binary diffs are done via COPY and INSERT </p>
+  <p> This does well if changes are confined to 1st order changes </p>
+  <br>
+  <p> Bsdiff4 finds fuzzy (approximate) matches into account and creates the following: </p>
+  <ol>
+    <li> A control file with ADD and INSERT instructions </li>
+    <li> A difference file that contains bytewise differences of the approximate matches </li>
+    <li> 'Extra' file that contains content that was not part of an approximate match </li>
+  <ol>
+  <p> These things together are typically larger than the destination file itself, but are highly compressible </p>
+</div>
+
+<div class="slide">
+  <h1> Takeaways </h1>
+  <p> Rebootless updates, and small binary diffs </p>
+  <ul>
+    <li> Reduce downtime </li>
+    <li> Decrease windows of security vulnerability </li>
+    <li> Improve user experience </li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>
